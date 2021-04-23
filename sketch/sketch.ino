@@ -11,9 +11,21 @@
 
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
-const char* ssid = "DWR-953-9E3D";
-const char* password = "RROT0PPH";
+// GPIO where the DS18B20 is connected to
+const int oneWireBus = 5;     
+
+// Setup a oneWire instance to communicate with any OneWire devices
+OneWire oneWire(oneWireBus);
+
+// Pass our oneWire reference to Dallas Temperature sensor 
+DallasTemperature sensors(&oneWire);
+
+
+const char* ssid = "COMHEM_485baa";
+const char* password = "mznkht4e";
 
 // Domain Name with full URL Path for HTTP POST Request
 const char* serverName = "https://hydroponics-api-bhtyw.ondigitalocean.app/sensor/temp";
@@ -42,8 +54,8 @@ void setup() {
  
   Serial.println("Timer set to 10 seconds (timerDelay variable), it will take 10 seconds before publishing the first reading.");
 
-  // Random seed is a number used to initialize a pseudorandom number generator
-  randomSeed(analogRead(33));
+    // Start the DS18B20 sensor
+  sensors.begin();
 }
 
 void loop() {
@@ -59,7 +71,12 @@ void loop() {
       // Specify content-type header
      http.addHeader("Content-Type", "application/json");
       // Data to send with HTTP POST
-      String httpRequestData = "{\"temp\": 1 }";           
+
+     sensors.requestTemperatures(); 
+    float temperatureC = sensors.getTempCByIndex(0);
+
+      String httpRequestData = "{\"temp\":" + String(temperatureC, 2) + "}"; 
+      Serial.println(httpRequestData);          
       // Send HTTP POST request
       int httpResponseCode = http.POST(httpRequestData);
       
