@@ -37,7 +37,7 @@ unsigned long lastTime = 0;
 // Set timer to 10 minutes (600000)
 //unsigned long timerDelay = 600000;
 // Timer set to 10 seconds (10000)
-unsigned long timerDelay = 10000;
+unsigned long timerDelay = 2 * 60 * 1000;
 
 void setup() {
   Serial.begin(115200);
